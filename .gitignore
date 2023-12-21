@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# ADD BY TEMP
+.vs/
+x64/
