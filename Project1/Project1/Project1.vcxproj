@@ -128,10 +128,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lexer_normal.c" />
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="LexicalAnalysis.cpp" />
+    <ClCompile Include="SyntaxAnalysis.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C:\Users\28061\Downloads\Mini-Compiler-新副本(1)\Mini-Compiler-新副本\Project1\Project1\testLex.h" />
     <ClInclude Include="lexer.h" />
+    <ClInclude Include="SyntaxAnalysis.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

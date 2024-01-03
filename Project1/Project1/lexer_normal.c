@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "lexer.h"
 
+/
+
 void error(int n)
 {
 	printf("Error %3d: %s\n", n, err_msg[n]);
@@ -286,14 +288,14 @@ void lexer(FILE* fp)
     //printf("END");
 }
 
-int main()
-{
-	//FILE *fp = fopen("D:\\source.txt", "r");
-	FILE* fp = fopen("D:\\test2.txt", "r");
-	if(fp!=NULL)
-		lexer(fp);
-	return 0;
-}
+//int main()
+//{
+//	//FILE *fp = fopen("D:\\source.txt", "r");
+//	FILE* fp = fopen("D:\\test2.txt", "r");
+//	if(fp!=NULL)
+//		lexer(fp);
+//	return 0;
+//}
 //(27, const)
 //(1, a)
 //(8, =)

@@ -1,0 +1,7 @@
+PROGRAM add
+CONST a:=10;    
+CONST b:=20;
+VAR c;         
+BEGIN
+     c:=a+b;
+END.

@@ -15,15 +15,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp">
+    <ClCompile Include="lexer_normal.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="lexer_normal.c">
+    <ClCompile Include="LexicalAnalysis.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SyntaxAnalysis.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lexer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SyntaxAnalysis.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\28061\Downloads\Mini-Compiler-新副本(1)\Mini-Compiler-新副本\Project1\Project1\testLex.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
