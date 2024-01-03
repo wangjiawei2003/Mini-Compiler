@@ -1,34 +1,32 @@
 ﻿#include "SyntaxAnalysis.h"
-#include "testLex.h"
+
 
 // 将标识符填入符号表 (enter object(constant, variable or procedre) into table.)
 // 从下标 1 开始
 void enter(int kind)
 {
-
     variableTable* vT;
     tx++; //记录符号表当前索引，初始值设置为0
     strcpy(table[tx].name, id);
     table[tx].kind = kind;
-    /// <summary>
-    /// 如果标识符是一个常量（ID_CONSTANT），那么检查其值是否超过最大地址（MAXADDRESS）。如果超过了，那么输出错误信息并将其值设置为0。然后将其值存储到符号表的当前位置。
-    /// 如果标识符是一个变量（ID_VARIABLE），那么将其层次设置为当前层次，并将其地址设置为当前的数据分配索引dx。然后将dx加1，为下一个变量腾出空间。
-    /// </summary>
-    switch (kind)
-    {
-    case ID_CONSTANT:
-        if (num > MAXADDRESS)
-        {
-            error(25); //太大了
-            num = 0;
-        }
-        table[tx].value = num;
-        break;
-    case ID_VARIABLE:
-        vT = (variableTable*)&table[tx];
-        vT->level = level;
-        vT->address = dx++;
-        break;
+    // 如果标识符是一个常量（ID_CONSTANT），那么检查其值是否超过最大地址（MAXADDRESS）。
+    //      如果超过了，那么输出错误信息并将其值设置为0。然后将其值存储到符号表的当前位置。
+    // 如果标识符是一个变量（ID_VARIABLE），那么将其层次设置为当前层次，
+    //      并将其地址设置为当前的数据分配索引dx。然后将dx加1，为下一个变量腾出空间。
+    switch (kind){
+        case ID_CONSTANT:
+            if (num > MAXADDRESS){
+                // num太大
+                error(25); //"The number is too great."
+                num = 0;
+            }
+            table[tx].value = num;
+            break;
+        case ID_VARIABLE:
+            vT = (variableTable*)&table[tx];
+            vT->level = level;
+            vT->address = dx++;
+            break;
     }
 }
 
@@ -47,9 +45,11 @@ int position(char* id)
 void constdeclaration()
 {
     if (sym == SYM_IDENTIFIER)
-    { //全局变量id中存有已识别的标识符
-        getsym();
-        if (sym == SYM_EQU || sym == SYM_BECOMES)
+    { 
+        //全局变量id中存有已识别的标识符
+        getsym();   
+        /* 可能不对*****************************/
+        if (sym == SYM_EQU || sym == SYM_ASSIGN)
         {
             if (sym == SYM_EQU)
                 error(1); // Found '=' when expecting ':='
@@ -163,7 +163,7 @@ void term()
 {
     int muloperation;
     factor();
-    while (sym == SYM_TIMES || sym == SYM_SLASH)
+    while (sym == SYM_TIMES || sym == SYM_DIVIDE)
     {
         muloperation = sym; // 记录下当前运算符
         getsym();
@@ -264,7 +264,7 @@ void statement()
             error(12); 
         }
         getsym();
-        if (sym == SYM_BECOMES) // :=
+        if (sym == SYM_ASSIGN) // :=
         {
             getsym();
         }
@@ -349,8 +349,7 @@ void statement()
 void printCodeToFile(const char* filename, int from, int to)
 {
     FILE* outFile = fopen(filename, "w");
-    if (!outFile)
-    {
+    if (!outFile){
         fprintf(stderr, "文件打开失败\n", filename);
         exit(1);
     }
@@ -480,24 +479,21 @@ void interpret()
 void block()
 {
     //后续变量定义主要用于代码生成
-
     int savedCx = cx;
+
     dx = 3; // 分配3个单元供运行期间存放静态链SL、动态链DL和返回地址RA
-    /// <summary>
-    /// 在这段代码中，dx = 3;是为了在运行时分配3个存储单元。这三个存储单元用于存放以下信息：
+    //在这段代码中，dx = 3;是为了在运行时分配3个存储单元。这三个存储单元用于存放以下信息：
     /// 静态链SL：存放的是定义该过程所对应的上一层过程，最近一次运行时的活动记录的起始单元1。
     /// 动态链DL：存放的是调用该过程前正在运行过程的活动记录的起始单元。过程返回时当前活动记录要被撤销，此时需要动态链信息来修改基址寄存器b的内容1。
     /// 返回地址RA：记录该过程返回后应该执行的下一条指令地址，即调用该过程的指令执行时指令地址寄存器p的内容加11。
-    /// </summary>
+
 
     gen(JMP, 0, 0); // 跳转到分程序的开始位置，由于当前还没有知道在何处开始，所以jmp的目标暂时填为0
 
 
-    while (1)
-    {
+    while (1){
         //最开始的嵌套级别是0
-        if (level > MAXLEVEL)
-        {
+        if (level > MAXLEVEL){
             error(32); // There are too many levels.
         }
         // <常量声明部分>:=const<常量定义>{,<常量定义>};
@@ -532,17 +528,15 @@ void block()
             if (sym == SYM_IDENTIFIER)
             {
                 vardeclaration();
-                while (sym == SYM_COMMA)
-                {
+
+                while (sym == SYM_COMMA){
                     getsym();
                     vardeclaration();
                 }
-                if (sym == SYM_SEMICOLON)
-                {
+                if (sym == SYM_SEMICOLON){
                     getsym();
                 }
-                else
-                {
+                else{
                     error(5); 
                 }
             }
@@ -554,8 +548,7 @@ void block()
             error(27);
             exit(1);
         }
-        else
-        {
+        else{
             break;
         }
     }
@@ -565,43 +558,3 @@ void block()
     statement(); // 语句
     gen(OPR, 0, OPR_RET); // 从分程序返回（对于 0 层的程序来说，就是程序运行完成，退出）
 }
-
-//int main()
-//{
-//    fp = fopen("input2.txt", "r");
-//    if (!fp)
-//    {
-//        printf("文件不存在");
-//        exit(1);
-//    }
-//
-//    // 检查源代码是否以'PROGRAM'关键词和一个标识符开始
-//    getsym();
-//    if (sym != SYM_PROGRAM) // 假设SYM_PROGRAM是'PROGRAM'关键词的词法单元类型
-//    {
-//        error(30); // 假设错误30表示"Missing 'PROGRAM' keyword."
-//    }
-//    else
-//    {
-//        getsym();
-//        if (sym != SYM_IDENTIFIER)
-//        {
-//            error(31); // 假设错误31表示"Missing identifier after 'PROGRAM' keyword."
-//        }
-//        else
-//        {
-//            getsym();
-//        }
-//    }
-//
-//    // <程序>:=<分程序>.
-//
-//    block();
-//
-//    if (err)
-//        printf("There are %d error(s) in PL/0 program.\n", err);
-//    else
-//        interpret();
-//    printCodeToFile("output.txt", 0, cx);
-//    return 0;
-//}

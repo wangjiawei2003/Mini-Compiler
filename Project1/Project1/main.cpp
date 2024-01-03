@@ -1,33 +1,28 @@
 #include "SyntaxAnalysis.h"
-#include "testLex.h"
-#include "SyntaxAnalysis.cpp"
+#include"CommonVar.h"
 
-
+// 项目入口
 int main()
 {
-    // 打开源文件
     fp = fopen("input2.txt", "r");
-    if (!fp)
-    {
+    // 文件不存在
+    if (!fp){
         printf("文件不存在");
         exit(1);
     }
 
     // 检查源代码是否以'PROGRAM'关键词和一个标识符开始
     getsym();
-    if (sym != SYM_PROGRAM) // 假设SYM_PROGRAM是'PROGRAM'关键词的词法单元类型
-    {
-        error(30); // 假设错误30表示"Missing 'PROGRAM' keyword."
+    // SYM_PROGRAM是'PROGRAM'关键词的词法单元类型
+    if (sym != SYM_PROGRAM) {
+        error(30); // 错误30表示"Missing 'PROGRAM' keyword."
     }
-    else
-    {
+    else{
         getsym();
-        if (sym != SYM_IDENTIFIER)
-        {
-            error(31); // 假设错误31表示"Missing identifier after 'PROGRAM' keyword."
+        if (sym != SYM_IDENTIFIER){
+            error(31); // 错误31表示"Missing identifier after 'PROGRAM' keyword."
         }
-        else
-        {
+        else{
             getsym();
         }
     }
@@ -37,9 +32,11 @@ int main()
     block();
 
     if (err)
-        printf("There are %d error(s) in PL/0 program.\n", err);
+        cout << "There are " << err << "error(s) in PL / 0 program." << endl;
     else
         interpret();
+
+    // 输出至output.txt
     printCodeToFile("output.txt", 0, cx);
     return 0;
 }

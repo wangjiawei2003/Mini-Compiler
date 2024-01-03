@@ -1,144 +1,408 @@
-//#define _CRT_SECURE_NO_WARNINGS
-//#include<iostream>
-//#include<string.h>
-//#include<stdio.h>
-//#include<stdlib.h>
-//using namespace std;
-//char token[50];
-//char ch;
+#include "LexicalAnalysis.h"
+
+
+// 在程序发生错误时输出相应的错误信息，并且累加错误计数器 err 的值。
+// n代表第n个错误，
+void error(int n)
+{
+    err++;
+    cout << "Error " << n << ": " << err_msg[n] << "\n";
+}
+
+void getch(){
+    ch = getc(fp);
+}
+
+
+//void getsym(){
+//    // 跳过空格、制表符、回车符和换行符
+//    while (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'){
+//        getch();
+//    }
+//    // 读到文件终止则退出
+//    if (ch == EOF){
+//        exit(0);
+//    }
 //
-//const char* keyword[] = { "if","else","while","for","int","float" };
-//char program[100];
-//int current = 0, q = 0; int row = 1, sign;
-//int number = 0;
-//void run() {
-//	sign = 0;
-//	number = 0;
-//	ch = program[current++];
-//	q = 0;
-//	while (ch == ' ')
-//	{
-//		ch = program[current++];
-//	}
-//	//字母开头（可能是标识符或者关键字） 
-//	if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
-//	{
-//		q = 0;
-//		while ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
-//		{
-//			token[q++] = ch;
-//			ch = program[current++];
-//			//含有数字，标识符 
-//			if ((ch >= '0' && ch <= '9'))
-//			{
-//				sign = 1;
-//			}
-//		}
-//		current--;
-//		//不含数字，可能是关键字 
-//		if (sign != 1) {
-//			for (int i = 0; i < 6; i++)
-//			{
-//				if (strcmp(token, keyword[i]) == 0)
-//				{
-//					sign = i + 3;
-//				}
-//			}
-//		}
-//		if (sign == 0)
-//			sign = 1;
-//	}
-//	else if ((ch >= '0' && ch <= '9'))
-//	{
-//		number = 0;
-//		while ((ch >= '0' && ch <= '9')) {
-//			number = number * 10 + ch - '0';
-//			ch = program[current++];
-//		}
-//		current--;
-//		sign = 2;
-//		if (number > 65535)sign = -1;
-//	}
-//	else switch (ch)
-//	{
-//	case '+':sign = 35; token[q++] = ch; break;
-//	case '-':sign = 36; token[q++] = ch; break;
-//	case '(':sign = 55; token[q++] = ch; break;
-//	case ')':sign = 56; token[q++] = ch; break;
-//	case ';':sign = 57; token[q++] = ch; break;
-//	case '=':
-//		ch = program[current++];
-//		if (ch == '=') {
-//			sign = 38; token[q++] = ch; token[q++] = ch;
-//			break;
-//		}
-//		else {
-//			sign = 37;
-//			token[q++] = '=';
-//			current--;
-//			break;
-//		}
-//	case '<':
-//		ch = program[current++];
-//		if (ch == '=') {
-//			sign = 40; token[q++] = '<'; token[q++] = '=';
-//			break;
-//		}
-//		else {
-//			sign = 39;
-//			token[q++] = '<';
-//			current--;
-//			break;
-//		}
-//	case '>':
-//		ch = program[current++];
-//		if (ch == '=')
-//		{
-//			sign = 42;
-//			token[q++] = '>'; token[q++] = '=';
-//			break;
-//		}
-//		else {
-//			sign = 41;
-//			token[q++] = '>';
-//			current--;
-//			break;
-//		}
-//	case '{':sign = 58; token[q++] = ch; break;
-//	case '}':sign = 59; token[q++] = ch; break;
-//	case ',':sign = 60; token[q++] = ch; break;
-//	case '\n':sign = -3; token[q++] = ch; break;
-//	default:sign = -1; break;
-//	}
-//	token[q++] = '\0';
+//    if (isalpha(ch)){
+//        char a[MAXIDLEN + 1];
+//        int k = 0;
+//        while ((isalpha(ch) || isdigit(ch)) && k < MAXIDLEN)
+//        {
+//            a[k++] = ch;
+//            getch();
+//        }
+//
+//        a[k] = '\0';
+//        strcpy(id, a);
+//
+//        int i = 1;
+//        for (int i= 1; i <= NRW; i++){
+//            if (strcmp(a, word[i]) == 0)
+//                break;
+//        }
+//        if (i <= NRW)
+//        {
+//            sym = wsym[i];
+//            cout << "检测到关键词  : " << a << "\n";
+//        }
+//        else
+//        {
+//            sym = SYM_IDENTIFIER;
+//            cout << "检测到标识符  : " << a << "\n";
+//        }
+//    }
+//    // 检测到数字则完整读取数字
+//    else if (isdigit(ch)){
+//        sym = SYM_NUMBER;
+//        int k = num = 0;
+//        while (isdigit(ch))
+//        {
+//            num = num * 10 + ch - '0';
+//            getch();
+//        }
+//        cout << "检测到数字    :  " << num << "\n";
+//    }
+//    else if (ch == ':')
+//    {
+//        getch();
+//        if (ch == '=')
+//        {
+//            sym = SYM_BECOMES;
+//            getch();
+//        }
+//        else
+//        {
+//            sym = SYM_NULL;
+//        }
+//        cout << "检测到赋值语句: :=\n";
+//    }
+//    else if (ch == '>')
+//    {
+//        getch();
+//        if (ch == '=')
+//        {
+//            sym = SYM_GEQ;
+//            getch();
+//        }
+//        else
+//        {
+//            sym = SYM_GTR;
+//        }
+//        cout << "检测到比较: >/>=\n";
+//    }
+//    else if (ch == '<')
+//    {
+//        getch();
+//        if (ch == '=')
+//        {
+//            sym = SYM_LEQ;
+//            getch();
+//        }
+//        else if (ch == '>')
+//        {
+//            sym = SYM_NEQ;
+//            getch();
+//        }
+//        else
+//        {
+//            sym = SYM_LES;
+//        }
+//        cout << "检测到比较: </<=/<>\n";
+//    }
+//    else{
+//        int i = 1;
+//        for (; i <= NSYM; i++)
+//        {
+//            if (ch == csym[i])
+//                break;
+//        }
+//        if (i <= NSYM)
+//        {
+//            sym = ssym[i];
+//            getch();
+//        }
+//        else
+//        {
+//            error(0);
+//            sym = SYM_NULL;
+//        }
+//        cout << "检测到其他字符\n";
+//    }
 //}
+
+
+
+void getsym(){
+	while (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')
+	{
+		ch = fgetc(fp);
+	}
+	if (isalpha(ch)) // 当前输入为字母,则应该为关键字或标识符
+	{
+		char a[MAXIDLEN + 1]; // 当前读取到的单词
+		int k = 0;
+		for (; (isalpha(ch) || isdigit(ch)) && k < MAXIDLEN; k++)
+		{
+			a[k] = ch;
+			ch = fgetc(fp);
+		}
+
+		a[k] = '\0'; // 字符数组和字符串的区别就是结尾少了\0，一定要加上！
+		// 检查是否为关键字
+		int i = 1;
+		for (; i <= NRW; i++)
+		{
+
+			if (strcmp(a, keyword[i]) == 0)
+			{
+				break;
+			}
+
+		}
+		if (i <= NRW)
+		{
+			sym = wsym[i]; // symbol is a reserved word
+		}
+		else
+		{
+			sym = SYM_IDENTIFIER; // symbol is an identifier
+		}
+		printf("(%d,%s)\n", sym, a);
+	}
+	else if (isdigit(ch))
+	{ // symbol is a number.
+		sym = SYM_NUMBER;
+		int k = 0;
+		int num = 0;
+		while (isdigit(ch))
+		{
+			num = num * 10 + ch - '0';
+			ch = fgetc(fp);
+			k++;
+		}
+		if (k > MAXNUMLEN)
+			error(25); // The number is too great.
+		else
+		{
+			printf("(%d,%d)\n", sym, num);
+		}
+	}
+	else if (ch == ':')
+	{
+		ch = fgetc(fp);
+		if (ch == '=')
+		{
+			sym = SYM_ASSIGN; // :=
+			ch = fgetc(fp);
+			printf("(%d,:=)\n", sym);
+		}
+		else
+		{
+			sym = SYM_NULL; // illegal?
+		}
+	}
+	else if (ch == '>')
+	{
+		ch = fgetc(fp);
+		if (ch == '=')
+		{
+			sym = SYM_GEQ; // >=
+			ch = fgetc(fp);
+			printf("(%d,>=)\n", sym);
+		}
+		else
+		{
+			sym = SYM_GTR; // >
+			printf("(%d,=)\n", sym);
+		}
+	}
+	else if (ch == '<')
+	{
+		ch = fgetc(fp);
+		if (ch == '=')
+		{
+			sym = SYM_LEQ; // <=
+			ch = fgetc(fp);
+			printf("(%d,<=)\n", sym);
+		}
+		else if (ch == '>')
+		{
+			sym = SYM_NEQ; // <>
+			ch = fgetc(fp);
+		}
+		else
+		{
+			sym = SYM_LES; // <
+			printf("(%d,<)\n", sym);
+		}
+	}
+	else if (ch == '{')
+	{ //忽略注释
+		int end = 1;
+		while (end)
+		{
+			ch = fgetc(fp);
+			if (ch == '}')
+				end = 0;
+		}
+		ch = fgetc(fp);
+	}
+	else
+	{ // other tokens : '+', '-', '*', '/', '(', ')', '=', ',', '.', ';'
+		//代码和识别关键字那里类似
+		int i = 1;
+		for (; i <= NSYM; i++)
+		{
+			if (ch == csym[i])
+				break;
+		}
+		if (i <= NSYM)
+		{
+			sym = ssym[i];
+			printf("(%d,%c)\n", sym, ch);
+			ch = fgetc(fp);
+		}
+		//不应该出现的字符
+		else if (ch != EOF)
+		{
+
+			printf("Fatal Error: Unknown character.\n");
+			exit(1);
+		}
+	}
+}
+
+
+//void lexer(FILE* fp)
+//{
+//	ch = fgetc(fp);
+//	int num_temp = 0;//read one effective symbol
 //
+//	while (ch != EOF && num_temp == 0)
+//	{
+//		//num_temp++;//delete this sentence ,then we can finish the lexer once a time 
+//		while (isspace(ch)) {
+//			ch = fgetc(fp);
+//		}
+//		if (ch == '{') // Comment
+//		{
+//			do
+//			{
+//				ch = fgetc(fp);
+//			} while (ch != '}' && ch != EOF);
+//			ch = fgetc(fp);
 //
-////int main()
-////{
-////
-////	FILE* fp;
-////	if ((fp = fopen("input.txt", "r")) == NULL)
-////	{
-////		cout << "ERROR" << endl;
-////		exit(1);
-////	}
-////	current = 0;
-////	while (EOF != (ch = fgetc(fp))) {
-////		program[current++] = ch;
-////	}
-////	int total = current;
-////	current = 0;
-////	while (current < total) {
-////		run();
-////		switch (sign)
-////		{
-////		case 1:cout << "(" << sign << ",指向" << token << "在符号表的入口)" << endl; break;
-////		case 2:cout << "(" << sign << ",指向" << number << "在符号表的入口)" << endl; break;
-////		case -1:cout << row << "行输入" << ch << "错误" << endl; break;
-////		case -3:row++; break;
-////		default:cout << "(" << sign << "," << '-' << ")" << endl; break;
-////		}
-////	}
-////	return 0;
-////}
+//		}
+//
+//		if (isalpha(ch)) // words or identifier
+//		{
+//			char words[MAXIDLEN + 1];
+//			int len = 0;
+//
+//			//Check if there is still a letter or num 
+//			while (isalnum(ch) && len < MAXIDLEN)
+//			{
+//				words[len++] = ch;
+//				ch = fgetc(fp);
+//			}
+//
+//			words[len] = '\0'; // Null-terminate the string
+//			strcpy(id, words); //save the value of identifier 
+//
+//			// Check if it's a keyword than is reserved
+//			int i = 0;
+//			while (i <= NRW && strcmp(words, keyword[i]) != 0)
+//			{
+//				i++;
+//			}
+//			if (i <= NRW) {
+//				sym = wsym[i];
+//				printf("(%d,%s)\n", wsym[i], words);
+//			}
+//			else {
+//				sym = SYM_IDENTIFIER;
+//				printf("(%d,%s)\n", SYM_IDENTIFIER, words);
+//			}
+//		}
+//		else if (isdigit(ch)) // Number
+//		{
+//			int num = 0;
+//			int len = 0;
+//
+//			while (isdigit(ch) && len < MAXNUMLEN)
+//			{
+//				num = num * 10 + (ch - '0');
+//				ch = fgetc(fp);
+//				len++;
+//			}
+//
+//			if (len == MAXNUMLEN)
+//				error(25); // The number is too large
+//			sym = SYM_NUMBER;
+//			printf("(%d,%d)\n", SYM_NUMBER, num);
+//		}
+//		else if (ch == ':')
+//		{
+//			ch = fgetc(fp);
+//			sym = (ch == '=') ? SYM_ASSIGN : SYM_NULL; // :=
+//			if (ch == '=') ch = fgetc(fp);
+//			printf("(%d,:=)\n", sym);
+//		}
+//		else if (ch == '>')
+//		{
+//			ch = fgetc(fp);
+//			if (ch == '=')
+//			{
+//				sym = SYM_GEQ; // >=
+//				ch = fgetc(fp);
+//			}
+//			else
+//			{
+//				sym = SYM_GTR; // >
+//			}
+//			printf("(%d,>=)\n", sym);
+//		}
+//		else if (ch == '<')
+//		{
+//			ch = fgetc(fp);
+//			if (ch == '=')
+//			{
+//				sym = SYM_LEQ; // <=
+//				ch = fgetc(fp);
+//			}
+//			else if (ch == '>')
+//			{
+//				sym = SYM_NEQ; // <>
+//				ch = fgetc(fp);
+//			}
+//			else
+//			{
+//				sym = SYM_LES; // <
+//			}
+//			printf("(%d,<)\n", sym);
+//		}
+//		else
+//		{
+//			// other tokens : '+', '-', '*', '/', '(', ')', '=', ',', '.', ';'
+//			int index = 0;
+//
+//			while (index <= NSYM && ch != csym[index]) {
+//				index++;
+//			}
+//
+//			if (index <= NSYM) {
+//				sym = ssym[index];
+//				printf("(%d,%c)\n", sym, ch);
+//				ch = fgetc(fp);
+//			}
+//			// Unrecognized character
+//			else {
+//				fprintf(stderr, "Fatal Error: Unknown character %c\n", ch);
+//				exit(1);
+//			}
+//		}
+//
+//	}
+//	//printf("END");
+//}
