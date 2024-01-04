@@ -1,30 +1,7 @@
 printCode:
-    0 JMP	0	1
-    1 INT	0	5
-    2 LIT	0	0
-    3 STO	0	4
-    4 LIT	0	0
-    5 STO	0	4
-    6 LOD	0	4
-    7 LIT	0	0
-    8 OPR	0	9
-    9 JPC	0	15
-   10 LOD	0	4
-   11 LIT	0	0
-   12 OPR	0	2
-   13 STO	0	4
-   14 JMP	0	6
-   15 LOD	0	4
-   16 LIT	0	0
-   17 OPR	0	11
-   18 JPC	0	23
-   19 LOD	0	4
-   20 LIT	0	0
-   21 OPR	0	3
-   22 STO	0	4
-   23 LOD	0	4
-   24 LOD	0	4
-   25 OPR	0	2
-   26 STO	0	4
-   27 OPR	0	0
+    0 INT	0	4
+    1 LOD	0	3
+    2 LOD	0	3
+    3 OPR	0	2
+    4 STO	0	3
 

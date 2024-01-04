@@ -4,7 +4,7 @@
 // 项目入口
 int main()
 {
-    fp = fopen("input2.txt", "r");
+    fp = fopen("input.txt", "r");
     // 文件不存在
     if (!fp){
         printf("文件不存在");
@@ -34,7 +34,8 @@ int main()
     if (err)
         cout << "There are " << err << "error(s) in PL / 0 program." << endl;
     else
-        interpret();
+        ;
+        //interpret();
 
     // 输出至output.txt
     printCodeToFile("output.txt", 0, cx);

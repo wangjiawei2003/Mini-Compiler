@@ -17,6 +17,8 @@
 #define CXMAX 500		 // size of code array
 #define MAXADDRESS 32767 // maximum address
 #define STACKSIZE 200	 // maximum storage
+#define QUADRUPLE_MAX 500 // 四元式的最大数量
+
 
 // 定义类别码
 enum symtype {
@@ -39,15 +41,16 @@ enum idtype
 // 指令的功能码
 enum opcode
 {
-	LIT,
-	OPR,
-	LOD,
-	STO,
-	CAL,
-	INT,
-	JMP,
-	JPC
+	LIT, // 将常数加载到栈顶，指令格式：LIT 0, A
+	OPR, // 执行运算或逻辑操作，指令格式：OPR L, A，其中 L 是操作的类型，A 是操作数
+	LOD, // 将变量加载到栈顶，指令格式：LOD L, A，其中 L 是层次差，A 是变量的相对地址
+	STO, // 将栈顶的值存储到变量中，指令格式：STO L, A，其中 L 是层次差，A 是变量的相对地址
+	CAL, // 调用过程，指令格式：CAL L, A，其中 L 是被调用过程的层次差，A 是被调用过程的地址
+	INT, // 分配空间，指令格式：INT 0, A，其中 A 是要分配的数据空间大小
+	JMP, // 无条件跳转，指令格式：JMP 0, A，其中 A 是跳转的目标地址
+	JPC  // 条件跳转，如果栈顶为零则跳转，指令格式：JPC 0, A，其中 A 是跳转的目标地址
 };
+
 
 // 指令的操作码
 enum oprcode
@@ -89,3 +92,13 @@ typedef struct
 	int l; // 层次差
 	int a; // 位移地址
 } instruction;
+
+
+// 四元式结构
+typedef struct {
+	int op;      // 操作码
+	int arg1;    // 参数1
+	int arg2;    // 参数2
+	int result;  // 结果
+} Quadruple;
+

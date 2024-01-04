@@ -1,5 +1,5 @@
 #pragma once
-#include"Common.h"
+#include "Common.h"
 
 // 此文件定义全局变量
 
@@ -47,7 +47,7 @@ int num;			   // 当前读取符号的值
 // 这里用table来存储要放入符号栈里的符号
 constantTable table[TXMAX]; // 符号表table[500]，存储常量、变量
 
-// 存储指令的数组
+// 存储最终结果指令的数组
 instruction code[CXMAX];
 
 int level = 0; // 这是嵌套级别。函数可以嵌套，主程序是0层，在主程序中定义的过程是1层，最多三层。这个变量用于跟踪当前代码的嵌套级别。
@@ -55,6 +55,9 @@ int cx = 0;	   // 这是将要生成的当前指令的索引。这个变量用于跟踪下一条指令的位置
 int tx = 0;	   // 这是表的索引。这个变量通常用于跟踪符号表或其他类似结构的当前位置。
 int dx = 0;	   // 这是数据分配索引，也就是数据地址索引。这个变量用于跟踪下一个可用的数据存储位置。
 
+// 用于存储四元式的数组
+Quadruple quadruples[QUADRUPLE_MAX]; 
+int quadIndex = 0; // 用于跟踪当前四元式的索引
 
 
 

@@ -15,6 +15,10 @@
 1. main.cpp main函数所在，程序开始，负责读取输出文件
 2. LexicalAnalysis.cpp  词法分析
 3. SyntaxAnalysis.cpp 语法分析+中间代码生成
+---
+语法规则以函数的形式实现，
+比如 constdeclaration() 处理常量声明，vardeclaration() 处理变量声明，statement() 处理语句等。
+
 
 
 
