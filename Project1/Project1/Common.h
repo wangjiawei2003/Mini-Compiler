@@ -48,8 +48,24 @@ enum opcode
 	CAL, // 调用过程，指令格式：CAL L, A，其中 L 是被调用过程的层次差，A 是被调用过程的地址
 	INT, // 分配空间，指令格式：INT 0, A，其中 A 是要分配的数据空间大小
 	JMP, // 无条件跳转，指令格式：JMP 0, A，其中 A 是跳转的目标地址
-	JPC  // 条件跳转，如果栈顶为零则跳转，指令格式：JPC 0, A，其中 A 是跳转的目标地址
+	JPC, // 条件跳转，如果栈顶为零则跳转，指令格式：JPC 0, A，其中 A 是跳转的目标地址
+
 };
+
+//
+enum operationCode {
+	CONSTASSIGNMENT, // 赋值
+	ASSIGNMENT,      // 赋值
+	OPRA_EQU,             //比较，逻辑操作
+	OPRA_NEQ,             //比较，逻辑操作
+	OPRA_LES,             //比较，逻辑操作
+	OPRA_LEQ,             //比较，逻辑操作
+	OPRA_GTR,             //比较，逻辑操作
+	OPRA_GEQ,             //比较，逻辑操作
+	OPRA_JMP, //跳转
+
+};
+
 
 
 // 指令的操作码

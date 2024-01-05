@@ -1,7 +1,9 @@
 PROGRAM add
-CONST a:=10;    
-CONST b:=20;
-VAR c;         
+VAR x,y;
 BEGIN
-     c:=a+b;
-END.
+x:=1;
+y:=2;
+WHILE x<5 DO x:=x+1;
+IF y>0 THEN y:=y-1;
+y:=y+x
+END

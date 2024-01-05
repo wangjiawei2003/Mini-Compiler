@@ -6,11 +6,11 @@ using namespace std;
 extern char ch;
 extern int err;
 extern enum symtype;
-extern FILE* fp;	   // 文件指针
+extern FILE* fp;	              // 文件指针
 extern const char* err_msg[];
-extern int sym;			   // 类型
-extern char id[MAXIDLEN + 1]; // 名称
-extern int num;			   // 值
+extern int sym;			          // 类型
+extern char id[MAXIDLEN + 1];     // 名称
+extern int num;			          // 值
 extern const char* keyword[NRW + 1];
 extern int wsym[NRW + 1];
 extern char csym[NSYM + 1];
@@ -21,7 +21,7 @@ extern int cx;	  // 这是将要生成的当前指令的索引。这个变量用于跟踪下一条指令的位
 extern int tx;
 extern int dx;    // 这是数据分配索引，也就是数据地址索引。这个变量用于跟踪下一个可用的数据存储位置。
 extern instruction code[CXMAX];
-extern constantTable table[TXMAX]; // 符号表table[500]，存储常量、变量
+extern constantTable table[TXMAX]; // 符号表table[500]，存储常量、变量，从1开始计数
 
 
 

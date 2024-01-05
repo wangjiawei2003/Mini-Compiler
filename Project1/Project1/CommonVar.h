@@ -29,7 +29,7 @@ char csym[NSYM + 1] = {
 };
 
 // 运算符和界符对应的类别码
-int ssym[NSYM + 1] = { //
+int ssym[NSYM + 1] = {
 	SYM_NULL, SYM_PLUS, SYM_MINUS, SYM_TIMES, SYM_DIVIDE,
 	SYM_LPAREN, SYM_RPAREN, SYM_EQU, SYM_COMMA, SYM_SEMICOLON
 };

@@ -16,11 +16,14 @@
 2. LexicalAnalysis.cpp  词法分析
 3. SyntaxAnalysis.cpp 语法分析+中间代码生成
 ---
-语法规则以函数的形式实现，
-比如 constdeclaration() 处理常量声明，vardeclaration() 处理变量声明，statement() 处理语句等。
+语法规则以函数的形式实现
+
+1. 比如 constdeclaration() 处理常量声明，
+2. vardeclaration() 处理变量声明，
+3. statement() 处理语句等。
 
 
-
+void constDeclaration()中，获取变量名称
 
    
 

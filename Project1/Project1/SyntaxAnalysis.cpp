@@ -24,7 +24,7 @@ void enter(int kind)
     tx++; //记录符号表当前索引，初始值设置为0
     strcpy(table[tx].name, id);
     table[tx].kind = kind;
-    // 如果标识符是一个常量（ID_CONSTANT），那么检查其值是否超过最大地址（MAXADDRESS）。
+    // 如果标识符是一个常量（ID_CONSTANT），那么检查其值是否超过最大（MAXADDRESS）。
     //      如果超过了，那么输出错误信息并将其值设置为0。然后将其值存储到符号表的当前位置。
     // 如果标识符是一个变量（ID_VARIABLE），那么将其层次设置为当前层次，
     //      并将其地址设置为当前的数据分配索引dx。然后将dx加1，为下一个变量腾出空间。
@@ -46,8 +46,7 @@ void enter(int kind)
 }
 
 // 在符号表table中查找id的位置,没找到返回0
-int position(char* id)
-{
+int position(char* id){
     int i;
     strcpy(table[0].name, id);
     i = tx + 1;
@@ -70,8 +69,10 @@ void constDeclaration()
             if (sym == SYM_EQU)
                 error(1); // Found '=' when expecting ':='
             getsym();
+
             if (sym == SYM_NUMBER){
                 enter(ID_CONSTANT); // 将标识符填入符号表
+                emit(ASSIGNMENT, num, NULL, *id);
                 getsym();
             }
             else{
@@ -87,23 +88,21 @@ void constDeclaration()
     }
 }
 
-// 判别<标识符>
-void varDeclaration(void)
-{
+
+// <标识符>→<字⺟>{<字⺟> | <数字>}
+void varDeclaration(void){
     if (sym == SYM_IDENTIFIER)
     {
         enter(ID_VARIABLE); // 将变量填入符号表
         getsym();
     }
-    else
-    {
+    else{
         error(4);
     }
 }
 
 // 生成汇编指令 (generates (assembles) an instruction.)
-void gen(int x, int y, int z)
-{ 
+void gen(int x, int y, int z){ 
     //最大指令数量 cx > 500
     if (cx > CXMAX){ 
         printf("Fatal Error: Program too long.\n");
@@ -119,10 +118,10 @@ void gen(int x, int y, int z)
 
 // 因子，把待运算的数放到栈中
 // 把项和因子独立开处理解决了加减号与乘除号的优先级问题
-void factor()
-{
-    if (sym == SYM_IDENTIFIER)//是标识符
-    {
+//<因子>→<标识符> |<无符号整数> | (<表达式>)
+void factor(){
+    // 如果读到 <标识符>
+    if (sym == SYM_IDENTIFIER){
         int i = position(id);  // 存储变量在符号表中位置
         // 如果未存储变量id
         if (i == 0){
@@ -145,83 +144,118 @@ void factor()
         }
         getsym();
     }
-    else if (sym == SYM_NUMBER)//是整数
+    // <无符号整数>
+    else if (sym == SYM_NUMBER)
     {
         if (num > MAXADDRESS){
             error(25);
             num = 0;
         }
         gen(LIT, 0, num); // 把常数放到栈顶
+        //emit(num, num, num, num);
         getsym();
     }
-    else if (sym == SYM_LPAREN) // (为开始
+    // <表达式> 读到( 为开始
+    else if (sym == SYM_LPAREN) 
     {
         getsym();
-        expression();          // 递归调用表达式
-        if (sym == SYM_RPAREN) // )为结尾
-        {
+        // 递归调用表达式
+        expression();
+        // ) 为结尾
+        if (sym == SYM_RPAREN){
             getsym();
         }
-        else
-        {
+        else{
             error(22); // 没有 ')'做匹配
         }
     }
 }
 
-// 项（乘除运算）
-void term()
-{
-    int muloperation;
-    factor();
-    while (sym == SYM_TIMES || sym == SYM_DIVIDE)
-    {
-        muloperation = sym; // 记录下当前运算符
-        getsym();
-        factor();
-        if (muloperation == SYM_TIMES){
-            gen(OPR, 0, OPR_MUL); // 将栈顶和次栈顶进行运算
-        }
-        else{
-            gen(OPR, 0, OPR_DIV);
-        }
-    }
-}
 
 /*
 *   对于表达式进行分析
-*   <表达式>→[+|-]项 | <表达式> <加法运算符> <项>
+*   <表达式>→[+|-]<项> | <表达式> <加法运算符> <项>
 */
 void expression()
 {
     int addoperation;
-    // 加减运算
-    if (sym == SYM_PLUS || sym == SYM_MINUS)
-    {
+    // [+|-]
+    if (sym == SYM_PLUS || sym == SYM_MINUS){
         addoperation = sym;
         getsym();
+
         factor();
         if (addoperation == SYM_MINUS){
             gen(OPR, 0, OPR_NEG);
         }
+        // <项>
         term();
     }
+    // <表达式> <加法运算符> <项>
     else{
+        //expression();
         term();
     }
+    // <加法运算符>
     while (sym == SYM_PLUS || sym == SYM_MINUS)
     {
         addoperation = sym;
         getsym();
+        // <项>
         term();
         if (addoperation == SYM_PLUS){
             gen(OPR, 0, OPR_ADD);
         }
         else{
             gen(OPR, 0, OPR_MIN);
+
         }
     }
 }
+
+// <项>→<因子> | <项><乘法运算符><因子>
+void term()
+{
+    int muloperation;
+    // <因子>
+    factor();
+    while (sym == SYM_TIMES || sym == SYM_DIVIDE) {
+        muloperation = sym; // 记录下当前运算符
+        getsym();
+        factor();
+        if (muloperation == SYM_TIMES) {
+            gen(OPR, 0, OPR_MUL); // 将栈顶和次栈顶进行运算
+            //emit()
+        }
+        else {
+            gen(OPR, 0, OPR_DIV);
+        }
+    }
+}
+
+
+
+void conditionDeclaration() {
+    getsym();
+    condition();
+    if (sym == SYM_THEN) {
+        getsym();
+    }
+    else {
+        error(16); // 'then' expected.
+    }
+
+    // THEN关键字后分析
+    //int savedCx = cx;
+    int savedPos = quadIndex;
+    emit(OPRA_JMP, 0, 0, 0);
+    gen(JPC, 0, 0);   // 条件转移指令，栈顶为非真时跳转到a
+    statement();      // 递归调用
+    //code[savedCx].a = cx; // 设置刚刚那个条件转移指令的跳转位置
+    quadruples[savedPos].result = quadIndex;
+    //emit()
+}
+
 
 // <条件>→<表达式> <关系运算符> <表达式>
 void condition()
@@ -240,21 +274,27 @@ void condition()
     switch (relationOperation){ 
         case SYM_EQU: // ==
             gen(OPR, 0, OPR_EQU);
+            emit(OPRA_EQU, 0, 0, NULL);
             break;
         case SYM_NEQ: // !=
             gen(OPR, 0, OPR_NEQ);
+            emit(OPRA_NEQ, 0, 0, NULL);
             break;
         case SYM_LES: // <
             gen(OPR, 0, OPR_LES);
+            emit(OPRA_LES, 0, 0, NULL);
             break;
         case SYM_LEQ: // <=
             gen(OPR, 0, OPR_LEQ);
+            emit(OPRA_LEQ, 0, 0, NULL);
             break;
         case SYM_GTR: // >
             gen(OPR, 0, OPR_GTR);
+            emit(OPRA_GTR, 0, 0, NULL);
             break;
         case SYM_GEQ: // >=
             gen(OPR, 0, OPR_GEQ);
+            emit(OPRA_GEQ, 0, 0, NULL);
             break;
         default:
             error(20);
@@ -266,7 +306,6 @@ void condition()
 void statement()
 {
     int i = 0, savedCx, savedCx_;
-
     // <赋值语句>
     if (sym == SYM_IDENTIFIER){ 
         assignmentDeclaration();
@@ -282,14 +321,11 @@ void statement()
     { 
         getsym();
         statement(); // 递归调用
-        while (sym == SYM_SEMICOLON)
-        {
-            if (sym == SYM_SEMICOLON)
-            {
+        while (sym == SYM_SEMICOLON){
+            if (sym == SYM_SEMICOLON){
                 getsym();
             }
-            else
-            {
+            else{
                 error(10);
             }
             statement();
@@ -298,8 +334,7 @@ void statement()
         {
            
         }
-        else
-        {
+        else{
             error(17); // ';' or 'end' expected.
         }
     }
@@ -309,7 +344,12 @@ void statement()
         circulationDeclaration();
 }
 
+
+
+
+
 // 变量赋值判断
+// <赋值语句>→<标识符>:=<表达式>
 void assignmentDeclaration() {
     int i = position(id);
     // 如果变量未定义，则报错
@@ -317,7 +357,7 @@ void assignmentDeclaration() {
         error(11);
     }
     // 如果该符号不是变量，则报错
-    else if (table[i].kind != ID_VARIABLE){
+    else if (table[i].kind != ID_VARIABLE) {
         error(12);
     }
 
@@ -325,83 +365,58 @@ void assignmentDeclaration() {
     getsym();
 
     // 如果是  :=  ，符合条件，获取下一个词
-    if (sym == SYM_ASSIGN){
+    if (sym == SYM_ASSIGN) {
         getsym();
     }
     // 不是 := 则报错："应使用':='符号"
-    else{
+    else {
         error(13);
     }
     expression(); // 分析赋值号右部表达式
+
     variableTable* vT;
     vT = (variableTable*)&table[i];
-    if (i){
+    if (i) {
         gen(STO, level - vT->level, vT->address); // 将栈顶内容存到刚刚识别到的变量里
+        // 将其以四元式
+        emit(ASSIGNMENT, num, NULL, *id);
+
     }
 
 
 }
 
-
-void conditionDeclaration() {
-    getsym();
-    condition();
-    if (sym == SYM_THEN)
-    {
-        getsym();
-    }
-    else
-    {
-        error(16); // 'then' expected.
-    }
-    int savedCx = cx;
-    gen(JPC, 0, 0);   // 条件转移指令，栈顶为非真时跳转到a
-    statement();      // 递归调用
-    code[savedCx].a = cx; // 设置刚刚那个条件转移指令的跳转位置
-
-
-}
-
-
-
+// <循环语句>→WHILE <条件> DO <语句>
 void circulationDeclaration(){
     getsym();
-    int savedCx = cx;   // while循环的开始位置
-    condition();    // 处理while里的条件
-    int savedCx_ = cx;  // while的do后的语句后的语句块的开始位置
-    gen(JPC, 0, 0); // 条件转移指令，转移位置暂时不知
+    int savedCx = cx;           // while循环的开始位置
 
+    // <条件>
+    condition();                // 处理while里的条件
+    int savedCx_ = cx;          // while的do后的语句后的语句块的开始位置
+    
+    int savedCodePos = quadIndex;   // 记录当前指令号码
+    cout << savedCodePos << endl;
+
+    emit(OPRA_JMP, 0, 0, 0);        // 条件转移指令，转移位置暂时不知
+    //gen(JPC, 0, 0);                  // 条件转移指令，转移位置暂时不知
+    
+    // DO
     if (sym == SYM_DO) {
         getsym();
     }
     else {
         error(18); // 'do' expected.
     }
+
+    // <语句>
     statement();          // 分析do后的语句块
     gen(JMP, 0, savedCx); // 无条件转移指令，跳转到cx1，再次进行逻辑判断
-    code[savedCx_].a = cx; // 填写刚才那个条件转移指令的跳转位置，while循环结束
+    //code[savedCx_].a = cx; // 填写刚才那个条件转移指令的跳转位置，while循环结束
+    quadruples[savedCodePos].result = quadIndex;    // 填写刚才那个条件转移指令的跳转位置
 }
 
 
-//打印生成的三地址四元式中间代码
-void printCodeToFile(const char* filename, int from, int to)
-{
-    FILE* outFile = fopen(filename, "w");
-    if (!outFile){
-        cout << "文件打开失败" << filename;
-        //fprintf(stderr, "文件打开失败\n", filename);
-        exit(1);
-    }
-
-    fprintf(outFile, "printCode:\n");
-    for (int i = from; i < to; i++)
-    {
-        fprintf(outFile, "%5d %s\t%d\t%d\n", i, mnemonic[code[i].f], code[i].l, code[i].a);
-    }
-    fprintf(outFile, "\n");
-
-    fclose(outFile);
-}
 
 int base(int stack[], int currentLevel, int levelDiff)
 {
@@ -510,19 +525,11 @@ void interpret()
         }
     } while (pc);
 
-    printf("\n停止执行PL/0程序\n");
+    cout << endl << "停止执行PL/0程序" << endl;
 }
 
 
-// 产生四元式用于显示
-void emit(int op, int arg1, int arg2, int result) {
-    quadruples[quadIndex].op = op;
-    quadruples[quadIndex].arg1 = arg1;
-    quadruples[quadIndex].arg2 = arg2;
-    quadruples[quadIndex].result = result;
-    quadIndex++;
-    return;
-}
+
 
 
 
@@ -548,8 +555,7 @@ void block()
             getsym();
             if (sym == SYM_IDENTIFIER){
                 constDeclaration();
-                //逗号
-                //循环处理id1=num1,id2=num2,……
+                //逗号则，循环处理id1=num1,id2=num2,……
                 while (sym == SYM_COMMA) {
                     getsym();
                     constDeclaration();
@@ -596,11 +602,54 @@ void block()
     }
     // 后续部分主要用于代码生成
     code[savedCx].a = cx; // 这时cx正好指向语句的开始位置，这个位置正是前面的 jmp 指令需要跳转到的位置
-    emit(JMP, SYM_NULL, SYM_NULL, cx);
-    gen(INT, 0, dx); // 为主程序在运行栈中开辟数据区，开辟 dx 个空间，作为这个分程序的第1条指令
 
-    //然后处理语句
-    statement(); // 语句
+    //然后处理所有语句
+    statement(); 
     //gen(OPR, 0, OPR_RET); // 从分程序返回（对于 0 层的程序来说，就是程序运行完成，退出）
 }
 
+
+
+
+
+/*
+* 产生四元式用于显示
+* op: 对应operationCode
+* arg1: 参数1
+* arg2: 参数2
+* result: 结果
+ */
+void emit(int op, int arg1, int arg2, int result) {
+    quadruples[quadIndex].op = op;
+    quadruples[quadIndex].arg1 = arg1;
+    quadruples[quadIndex].arg2 = arg2;
+    quadruples[quadIndex].result = result;
+    quadIndex++;
+    cout << "op: " << op;
+    cout << " |  arg1: " << arg1;
+    cout << " |  arg2: " << arg2;
+    cout << " |  result: " << result << endl;
+    return;
+}
+
+// 打印生成的三地址四元式中间代码
+void printCodeToFile(const char* filename, int from, int to)
+{
+    FILE* outFile = fopen(filename, "w");
+    if (!outFile) {
+        cout << "文件打开失败" << filename;
+        //fprintf(stderr, "文件打开失败\n", filename);
+        exit(1);
+    }
+
+    fprintf(outFile, "printCode:\n");
+
+    //将quadIndex中元素输入文件
+    for (int i = from; i < to; i++)
+    {
+        fprintf(outFile, "%5d %s\t%d\t%d\n", i, mnemonic[code[i].f], code[i].l, code[i].a);
+    }
+    fprintf(outFile, "\n");
+
+    fclose(outFile);
+}

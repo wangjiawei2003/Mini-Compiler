@@ -37,6 +37,14 @@ int main()
         ;
         //interpret();
 
+
+    cout << "----------------------" << endl;
+    for (int i = 0;i < 30;i++)
+        cout << quadruples[i].op << "   "
+        << quadruples[i].arg1 << "   "
+        << quadruples[i].arg2 << "   "
+        << quadruples[i].result << endl;
+
     // Êä³öÖÁoutput.txt
     printCodeToFile("output.txt", 0, cx);
     return 0;

@@ -167,6 +167,8 @@ void getsym(){
 		else
 		{
 			sym = SYM_IDENTIFIER; // symbol is an identifier
+			strcpy(id, a);
+
 		}
 		printf("(%d,%s)\n", sym, a);
 	}
@@ -174,7 +176,7 @@ void getsym(){
 	{ // symbol is a number.
 		sym = SYM_NUMBER;
 		int k = 0;
-		int num = 0;
+		num = 0;
 		while (isdigit(ch))
 		{
 			num = num * 10 + ch - '0';
