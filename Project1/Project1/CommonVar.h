@@ -58,8 +58,8 @@ int dx = 0;	   // 这是数据分配索引，也就是数据地址索引。这个变量用于跟踪下一个可
 // 用于存储四元式的数组
 Quadruple quadruples[QUADRUPLE_MAX]; 
 int quadIndex = 0; // 用于跟踪当前四元式的索引
-
-
+Factor temp_factor[QUADRUPLE_MAX];
+int temp_factor_id = 0;
 
 //定义所有报错信息
 const char* err_msg[] =
@@ -97,4 +97,9 @@ const char* err_msg[] =
 	/* 30 */ "缺少程序首部\'PROGRAM\'关键词",
 	/* 31 */ "缺少程序首部\'PROGRAM\'关键词后面的标识符",
 	/* 32 */ "嵌套级别过大，最多3层"
+};
+
+//四元式生成目标代码指令
+const char* codeIntrustion[11] = {
+	":=",":=","==","!=","<","<=",">",">=","j","*","/"
 };

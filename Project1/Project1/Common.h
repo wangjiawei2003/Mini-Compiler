@@ -64,6 +64,10 @@ enum operationCode {
 	OPRA_GEQ,             //比较，逻辑操作
 	OPRA_JMP, //跳转
 
+	OPRA_ADD, //乘法运算
+	OPRA_MIN, //乘法运算
+	OPRA_MUL, //乘法运算
+	OPRA_DIV, //跳转
 };
 
 
@@ -118,3 +122,8 @@ typedef struct {
 	int result;  // 结果
 } Quadruple;
 
+
+typedef struct {
+	int index;  //0 constant 常量，1 变量
+	int value;
+}Factor;

@@ -39,7 +39,7 @@ int main()
 
 
     cout << "----------------------" << endl;
-    for (int i = 0;i < 30;i++)
+    for (int i = 0;i < 15;i++)
         cout << quadruples[i].op << "   "
         << quadruples[i].arg1 << "   "
         << quadruples[i].arg2 << "   "

@@ -72,7 +72,7 @@ void constDeclaration()
 
             if (sym == SYM_NUMBER){
                 enter(ID_CONSTANT); // 将标识符填入符号表
-                emit(ASSIGNMENT, num, NULL, *id);
+                emit(ASSIGNMENT, num, NULL, tx);
                 getsym();
             }
             else{
@@ -132,12 +132,16 @@ void factor(){
             variableTable* vT;
             // 判断变量种类
             switch (table[i].kind){
-                // 变量是常量
+                temp_factor_id++;
+                temp_factor[temp_factor_id].index = 1;
+                temp_factor[temp_factor_id].value = i;
+                // 变量是常量Const,
                 case ID_CONSTANT:
                     gen(LIT, 0, table[i].value); // 把常数放到栈顶
                     break;
                 case ID_VARIABLE:
                     vT = (variableTable*)&table[i];
+                    cout << "vT:" << vT->address << endl;
                     gen(LOD, level - vT->level, vT->address); // 如果是变量，根据层次差和地址去栈里面找到这个值，把变量放到栈顶
                     break;
             }
@@ -151,8 +155,11 @@ void factor(){
             error(25);
             num = 0;
         }
+        temp_factor_id++;
+        temp_factor[temp_factor_id].index = 0;
+        temp_factor[temp_factor_id].value = num;
         gen(LIT, 0, num); // 把常数放到栈顶
-        //emit(num, num, num, num);
+
         getsym();
     }
     // <表达式> 读到( 为开始
@@ -175,27 +182,29 @@ void factor(){
 /*
 *   对于表达式进行分析
 *   <表达式>→[+|-]<项> | <表达式> <加法运算符> <项>
+*   <项> (<加法运算符> <项>)^*
 */
 void expression()
 {
     int addoperation;
+    int temp_id_factor;
     // [+|-]
     if (sym == SYM_PLUS || sym == SYM_MINUS){
         addoperation = sym;
         getsym();
 
         factor();
+
         if (addoperation == SYM_MINUS){
             gen(OPR, 0, OPR_NEG);
         }
-        // <项>
-        term();
+
+    
     }
-    // <表达式> <加法运算符> <项>
-    else{
-        //expression();
-        term();
-    }
+    // <项>
+    term();
+    temp_id_factor = temp_factor_id;
+
     // <加法运算符>
     while (sym == SYM_PLUS || sym == SYM_MINUS)
     {
@@ -203,12 +212,19 @@ void expression()
         getsym();
         // <项>
         term();
+
+        // 生成中间变量
+        string temp = newtemp();
+        tx++;
+        strcpy(table[tx].name, temp.c_str());
+        table[tx].kind = ID_VARIABLE;
         if (addoperation == SYM_PLUS){
             gen(OPR, 0, OPR_ADD);
+            emit(OPRA_ADD, temp_factor_id, temp_id_factor, tx);
         }
         else{
             gen(OPR, 0, OPR_MIN);
-
+            emit(OPRA_MIN, temp_factor_id, temp_id_factor, tx);
         }
     }
 }
@@ -219,15 +235,27 @@ void term()
     int muloperation;
     // <因子>
     factor();
+    int temp_id_factor = temp_factor_id;
+
     while (sym == SYM_TIMES || sym == SYM_DIVIDE) {
         muloperation = sym; // 记录下当前运算符
         getsym();
         factor();
+
+        // 生成中间变量 t0，t1...
+        string temp = newtemp();
+        tx++;
+        strcpy(table[tx].name, temp.c_str());
+        table[tx].kind = ID_VARIABLE;
         if (muloperation == SYM_TIMES) {
+            emit(OPRA_MUL, temp_factor_id, temp_id_factor, tx);
+            //emit(OPRA_MUL, tempFactor.index, temp_factor.index, tx);
             gen(OPR, 0, OPR_MUL); // 将栈顶和次栈顶进行运算
-            //emit()
         }
         else {
+            emit(OPRA_DIV, temp_factor_id, temp_id_factor, tx);
+
+            //emit(OPRA_DIV, tempFactor.index, temp_factor.index, tx);
             gen(OPR, 0, OPR_DIV);
         }
     }
@@ -253,7 +281,7 @@ void conditionDeclaration() {
     statement();      // 递归调用
     //code[savedCx].a = cx; // 设置刚刚那个条件转移指令的跳转位置
     quadruples[savedPos].result = quadIndex;
-    //emit()
+
 }
 
 
@@ -317,26 +345,8 @@ void statement()
     }
 
     //复合语句，顺序执行begin和end之间的语句就好
-    else if (sym == SYM_BEGIN)
-    { 
-        getsym();
-        statement(); // 递归调用
-        while (sym == SYM_SEMICOLON){
-            if (sym == SYM_SEMICOLON){
-                getsym();
-            }
-            else{
-                error(10);
-            }
-            statement();
-        }
-        if (sym == SYM_END)
-        {
-           
-        }
-        else{
-            error(17); // ';' or 'end' expected.
-        }
+    else if (sym == SYM_BEGIN){ 
+        combinedDeclaration();
     }
 
     // <循环语句>
@@ -344,7 +354,28 @@ void statement()
         circulationDeclaration();
 }
 
+// 复合语句
+void combinedDeclaration() {
+    getsym();
+    statement(); // 递归调用
+    while (sym == SYM_SEMICOLON) {
+        if (sym == SYM_SEMICOLON) {
+            getsym();
+        }
+        else {
+            error(10);
+        }
+        statement();
+    }
+    if (sym == SYM_END)
+    {
 
+    }
+    else {
+        error(17); // ';' or 'end' expected.
+    }
+
+}
 
 
 
@@ -379,7 +410,7 @@ void assignmentDeclaration() {
     if (i) {
         gen(STO, level - vT->level, vT->address); // 将栈顶内容存到刚刚识别到的变量里
         // 将其以四元式
-        emit(ASSIGNMENT, num, NULL, *id);
+        emit(ASSIGNMENT, num, NULL, i);
 
     }
 
@@ -411,6 +442,7 @@ void circulationDeclaration(){
 
     // <语句>
     statement();          // 分析do后的语句块
+    emit(OPRA_JMP, 0, 0,-1);
     gen(JMP, 0, savedCx); // 无条件转移指令，跳转到cx1，再次进行逻辑判断
     //code[savedCx_].a = cx; // 填写刚才那个条件转移指令的跳转位置，while循环结束
     quadruples[savedCodePos].result = quadIndex;    // 填写刚才那个条件转移指令的跳转位置
@@ -644,10 +676,21 @@ void printCodeToFile(const char* filename, int from, int to)
 
     fprintf(outFile, "printCode:\n");
 
+    //SyntaxAnalysis.cpp
     //将quadIndex中元素输入文件
-    for (int i = from; i < to; i++)
+    int length = 0;
+    for (int i = 0; i < QUADRUPLE_MAX; i++) {
+        if (quadruples[i].op != NULL) {
+            length++;
+        }
+    }
+
+    for (int i = 0; i < length; i++)
+
     {
-        fprintf(outFile, "%5d %s\t%d\t%d\n", i, mnemonic[code[i].f], code[i].l, code[i].a);
+
+        fprintf(outFile, "%5d %s\t%d\t%d\t%s\n", i, codeIntrustion[quadruples[i].op], quadruples[i].arg1, quadruples[i].arg2, table[quadruples[i].result].name);
+
     }
     fprintf(outFile, "\n");
 
