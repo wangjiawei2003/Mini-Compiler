@@ -14,124 +14,6 @@ void getch(){
 }
 
 
-//void getsym(){
-//    // 跳过空格、制表符、回车符和换行符
-//    while (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'){
-//        getch();
-//    }
-//    // 读到文件终止则退出
-//    if (ch == EOF){
-//        exit(0);
-//    }
-//
-//    if (isalpha(ch)){
-//        char a[MAXIDLEN + 1];
-//        int k = 0;
-//        while ((isalpha(ch) || isdigit(ch)) && k < MAXIDLEN)
-//        {
-//            a[k++] = ch;
-//            getch();
-//        }
-//
-//        a[k] = '\0';
-//        strcpy(id, a);
-//
-//        int i = 1;
-//        for (int i= 1; i <= NRW; i++){
-//            if (strcmp(a, word[i]) == 0)
-//                break;
-//        }
-//        if (i <= NRW)
-//        {
-//            sym = wsym[i];
-//            cout << "检测到关键词  : " << a << "\n";
-//        }
-//        else
-//        {
-//            sym = SYM_IDENTIFIER;
-//            cout << "检测到标识符  : " << a << "\n";
-//        }
-//    }
-//    // 检测到数字则完整读取数字
-//    else if (isdigit(ch)){
-//        sym = SYM_NUMBER;
-//        int k = num = 0;
-//        while (isdigit(ch))
-//        {
-//            num = num * 10 + ch - '0';
-//            getch();
-//        }
-//        cout << "检测到数字    :  " << num << "\n";
-//    }
-//    else if (ch == ':')
-//    {
-//        getch();
-//        if (ch == '=')
-//        {
-//            sym = SYM_BECOMES;
-//            getch();
-//        }
-//        else
-//        {
-//            sym = SYM_NULL;
-//        }
-//        cout << "检测到赋值语句: :=\n";
-//    }
-//    else if (ch == '>')
-//    {
-//        getch();
-//        if (ch == '=')
-//        {
-//            sym = SYM_GEQ;
-//            getch();
-//        }
-//        else
-//        {
-//            sym = SYM_GTR;
-//        }
-//        cout << "检测到比较: >/>=\n";
-//    }
-//    else if (ch == '<')
-//    {
-//        getch();
-//        if (ch == '=')
-//        {
-//            sym = SYM_LEQ;
-//            getch();
-//        }
-//        else if (ch == '>')
-//        {
-//            sym = SYM_NEQ;
-//            getch();
-//        }
-//        else
-//        {
-//            sym = SYM_LES;
-//        }
-//        cout << "检测到比较: </<=/<>\n";
-//    }
-//    else{
-//        int i = 1;
-//        for (; i <= NSYM; i++)
-//        {
-//            if (ch == csym[i])
-//                break;
-//        }
-//        if (i <= NSYM)
-//        {
-//            sym = ssym[i];
-//            getch();
-//        }
-//        else
-//        {
-//            error(0);
-//            sym = SYM_NULL;
-//        }
-//        cout << "检测到其他字符\n";
-//    }
-//}
-
-
 
 void getsym(){
 	while (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')
@@ -239,17 +121,17 @@ void getsym(){
 			printf("(%d,<)\n", sym);
 		}
 	}
-	else if (ch == '{')
-	{ //忽略注释
-		int end = 1;
-		while (end)
-		{
-			ch = fgetc(fp);
-			if (ch == '}')
-				end = 0;
-		}
-		ch = fgetc(fp);
-	}
+	//else if (ch == '{')
+	//{ //忽略注释
+	//	int end = 1;
+	//	while (end)
+	//	{
+	//		ch = fgetc(fp);
+	//		if (ch == '}')
+	//			end = 0;
+	//	}
+	//	ch = fgetc(fp);
+	//}
 	else
 	{ // other tokens : '+', '-', '*', '/', '(', ')', '=', ',', '.', ';'
 		//代码和识别关键字那里类似

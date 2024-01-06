@@ -3,7 +3,7 @@
 
 #include "Common.h"
 #include "LexicalAnalysis.h"
-
+#include<string>
 // º¯ÊýÉùÃ÷
 void interpret();
 void block();
@@ -28,6 +28,7 @@ void term();
 
 void emit(int op, int arg1, int arg2, int  result);
 
+void printTol(FILE* outFile);
 
 extern Quadruple quadruples[QUADRUPLE_MAX];
 extern int quadIndex; 

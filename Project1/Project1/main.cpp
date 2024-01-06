@@ -34,18 +34,24 @@ int main()
     if (err)
         cout << "There are " << err << "error(s) in PL / 0 program." << endl;
     else
-        ;
-        //interpret();
+        // 输出至output.txt
+        printCodeToFile("output.txt", 0, cx);
 
 
-    cout << "----------------------" << endl;
-    for (int i = 0;i < 15;i++)
-        cout << quadruples[i].op << "   "
-        << quadruples[i].arg1 << "   "
-        << quadruples[i].arg2 << "   "
-        << quadruples[i].result << endl;
+    // JUST for Test
+    //cout << "----------------------" << endl;
+    //for (int i = 0;i < 15;i++)
+    //    cout <<i<<"   " << quadruples[i].op << "   "
+    //    << quadruples[i].arg1 << "   "
+    //    << quadruples[i].arg2 << "   "
+    //    << quadruples[i].result << endl;
 
-    // 输出至output.txt
-    printCodeToFile("output.txt", 0, cx);
+    //for (int i = 0;i < 15;i++)
+    //    cout << i << "   " << temp_factor[i].index << "   " << temp_factor[i].value << endl;
+    //   
+
+    //for (int i = 0;i < 15;i++)
+    //    cout << i << "   " << table[i].kind << "   " << table[i].name << "      " << table[i].value << endl;
+
     return 0;
 }

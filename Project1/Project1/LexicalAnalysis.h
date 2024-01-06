@@ -22,7 +22,7 @@ extern int tx;
 extern int dx;    // 这是数据分配索引，也就是数据地址索引。这个变量用于跟踪下一个可用的数据存储位置。
 extern instruction code[CXMAX];
 extern constantTable table[TXMAX]; // 符号表table[500]，存储常量、变量，从1开始计数
-extern const char* codeIntrustion[11];
+extern const char* codeIntrustion[20];
 
 
 void error(int n);

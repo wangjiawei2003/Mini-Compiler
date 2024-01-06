@@ -62,12 +62,12 @@ enum operationCode {
 	OPRA_LEQ,             //比较，逻辑操作
 	OPRA_GTR,             //比较，逻辑操作
 	OPRA_GEQ,             //比较，逻辑操作
-	OPRA_JMP, //跳转
+	OPRA_JMP,             //跳转
 
-	OPRA_ADD, //乘法运算
-	OPRA_MIN, //乘法运算
-	OPRA_MUL, //乘法运算
-	OPRA_DIV, //跳转
+	OPRA_ADD,             //加法运算
+	OPRA_MIN,             //减法运算
+	OPRA_MUL,             //乘法运算
+	OPRA_DIV,             //除法运算
 };
 
 
