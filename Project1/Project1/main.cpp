@@ -50,8 +50,8 @@ int main()
     //    cout << i << "   " << temp_factor[i].index << "   " << temp_factor[i].value << endl;
     //   
 
-    //for (int i = 0;i < 15;i++)
-    //    cout << i << "   " << table[i].kind << "   " << table[i].name << "      " << table[i].value << endl;
+    for (int i = 0;i < 15;i++)
+        cout << i << "   " << table[i].kind << "   " << table[i].name << "      " << table[i].value << endl;
 
     return 0;
 }

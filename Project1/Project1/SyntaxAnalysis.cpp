@@ -61,6 +61,7 @@ int position(char* id){
 // <常量定义>→<标识符>:=<⽆符号整数>
 void constDeclaration()
 {
+    cout << "afdsadfasdf" << endl;
     if (sym == SYM_IDENTIFIER)
     { 
         //全局变量id中存有已识别的标识符
@@ -70,9 +71,12 @@ void constDeclaration()
                 error(1); // Found '=' when expecting ':='
             getsym();
 
+
             if (sym == SYM_NUMBER){
+                int temp_cons = tx;
                 enter(ID_CONSTANT); // 将标识符填入符号表
-                emit(CONSTASSIGNMENT, table[tx].value, NULL, tx);
+                //cout << tx << "::::" << table[tx].value;
+                emit(CONSTASSIGNMENT, tx, NULL, temp_cons);
                 getsym();
             }
             else{
@@ -634,20 +638,23 @@ void printTol(FILE* outFile) {
             break;
 
         case(ASSIGNMENT):
-        case(CONSTASSIGNMENT):
             if (table[arg1_id].kind == 0)
                 a1 = to_string(table[arg1_id].value);
                 //a1 = to_string(temp_factor[quadruples[i].arg1].value);
             else
                 a1 = table[arg1_id].name;
-
-                //a1 = table[temp_factor[arg1_id].value].name;
             a2 = "_";
             fprintf(outFile, "%-5d %-10s % -10s % -10s %-10s\n", i, codeIntrustion[quadruples[i].op], a1.c_str(), a2.c_str(), table[quadruples[i].result].name);
 
             break;
+        case(CONSTASSIGNMENT):
+            a1 = to_string(table[arg1_id].value);
+            //cout << "debug:" << a1 << endl;
 
+            a2 = "_";
+            fprintf(outFile, "%-5d %-10s % -10s % -10s %-10s\n", i, codeIntrustion[quadruples[i].op], a1.c_str(), a2.c_str(), table[quadruples[i].result].name);
 
+            break;
 
         case(OPRA_JMP):
             a1 = "_";
